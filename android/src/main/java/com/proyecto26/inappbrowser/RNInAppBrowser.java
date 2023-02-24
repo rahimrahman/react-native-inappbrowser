@@ -72,6 +72,7 @@ public class RNInAppBrowser {
   private Boolean isLightTheme;
   private Activity currentActivity;
   private static final Pattern animationIdentifierPattern = Pattern.compile("^.+:.+/");
+  private CustomTabsSession mSession;
 
   @Nullable
   private CustomTabsClient customTabsClient;
@@ -123,7 +124,7 @@ public class RNInAppBrowser {
       return;
     }
 
-    CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+    CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder(mSession);
     isLightTheme = false;
     final Integer toolbarColor = setColor(builder, options, KEY_TOOLBAR_COLOR, "setToolbarColor", "toolbar");
     if (toolbarColor != null) {
@@ -332,7 +333,7 @@ public class RNInAppBrowser {
     return packageName;
   }
 
-  public void onStart(Activity activity) {
+  public void onStart(Activity activity, String url) {
     Context applicationContext = activity.getApplicationContext();
     CustomTabsServiceConnection connection = new CustomTabsServiceConnection() {
       @Override
@@ -341,6 +342,11 @@ public class RNInAppBrowser {
         if (!customTabsClient.warmup(0L)) {
           System.err.println("Couldn't warmup custom tabs client");
         }
+        mSession = customTabsClient.newSession(null);
+        if (url != null && !url.trim().isEmpty()) {
+          mSession.validateRelationship(CustomTabsService.RELATION_USE_AS_ORIGIN, Uri.parse(url), null);
+        }
+
         applicationContext.unbindService(this);
       }
 

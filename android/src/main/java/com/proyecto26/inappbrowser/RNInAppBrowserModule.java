@@ -42,8 +42,8 @@ public class RNInAppBrowserModule extends ReactContextBaseJavaModule {
     RNInAppBrowser.getInstance().isAvailable(this.reactContext, promise);
   }
 
-  public static void onStart(final Activity activity) {
-    RNInAppBrowser.getInstance().onStart(activity);
+  public static void onStart(final Activity activity, final String url) {
+    RNInAppBrowser.getInstance().onStart(activity, url);
   }
 
   @ReactMethod
